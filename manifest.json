@@ -2,7 +2,7 @@
   "name": "Dompetku - Pencatat Keuangan",
   "short_name": "Dompetku",
   "description": "Pencatat pengeluaran dan pemasukan pintar dengan AI",
-  "start_url": "/",
+  "start_url": "/dompetku/",
   "display": "standalone",
   "background_color": "#F5F6FA",
   "theme_color": "#7C3AED",
