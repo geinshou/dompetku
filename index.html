@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <meta name="theme-color" content="#7C3AED"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+  <meta name="apple-mobile-web-app-title" content="Dompetku"/>
+  <link rel="manifest" href="manifest.json"/>
+  <title>Dompetku</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+    body{font-family:-apple-system,'Inter',sans-serif;background:#F5F6FA;color:#111827;overscroll-behavior:none;}
+    #root{max-width:430px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;}
+
+    /* HEADER */
+    .header{background:#fff;border-bottom:1px solid #E5E7EB;padding:13px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
+    .header-title{font-size:18px;font-weight:800;color:#111827;}
+    .toggle-btn{background:none;border:none;cursor:pointer;font-size:20px;padding:4px;}
+
+    /* HERO */
+    .hero{background:linear-gradient(160deg,#EDE9FE,#F5F3FF);padding:22px 18px 18px;}
+    .hero.dark{background:linear-gradient(160deg,#1A0A3A,#0A0A1A)!important;}
+    .hero-label{font-size:11px;color:#4C1D95;font-weight:600;opacity:.7;margin-bottom:4px;}
+    .hero.dark .hero-label{color:#C4B5FD;}
+    .hero-bal{font-size:32px;font-weight:900;color:#1F2937;letter-spacing:-1px;}
+    .hero.dark .hero-bal{color:#fff;}
+    .hero-cards{display:flex;gap:8px;margin-top:14px;}
+    .hero-card{flex:1;background:rgba(255,255,255,.75);border-radius:10px;padding:10px 12px;}
+    .hero.dark .hero-card{background:rgba(255,255,255,.08);}
+    .hc-label{font-size:10px;color:#6B7280;margin-bottom:3px;}
+    .hero.dark .hc-label{color:#9CA3AF;}
+    .hc-val{font-size:14px;font-weight:700;}
+
+    /* SCROLL */
+    .scroll{flex:1;overflow-y:auto;padding:14px 14px 80px;}
+
+    /* QUICK ADD */
+    .quick-add{display:flex;gap:10px;margin-bottom:14px;}
+    .qa-btn{flex:1;padding:13px;border-radius:14px;border:1.5px solid;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;}
+    .qa-btn.exp{background:#FFF1F2;border-color:#FECDD3;color:#DC2626;}
+    .qa-btn.inc{background:#F0FDF4;border-color:#BBF7D0;color:#16A34A;}
+
+    /* CARD */
+    .card{background:#fff;border:1px solid #E5E7EB;border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.05);}
+    .section-label{font-size:11px;color:#9CA3AF;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;}
+
+    /* CATEGORY BARS */
+    .cat-row{margin-bottom:10px;}
+    .cat-meta{display:flex;justify-content:space-between;margin-bottom:4px;font-size:13px;}
+    .bar-track{background:#F3F4F6;border-radius:4px;height:5px;}
+    .bar-fill{height:5px;border-radius:4px;transition:width .4s;}
+
+    /* TRANSACTION ROWS */
+    .tx-row{display:flex;align-items:center;gap:11px;padding:9px 0;border-bottom:1px solid #F3F4F6;}
+    .tx-icon{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+    .tx-icon.exp{background:#FFF1F2;}
+    .tx-icon.inc{background:#F0FDF4;}
+    .tx-desc{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .tx-sub{font-size:11px;color:#9CA3AF;margin-top:1px;}
+    .tx-amt{font-size:14px;font-weight:700;flex-shrink:0;}
+    .tx-amt.exp{color:#DC2626;}
+    .tx-amt.inc{color:#16A34A;}
+    .tx-del{background:none;border:none;color:#D1D5DB;cursor:pointer;font-size:16px;padding:4px;flex-shrink:0;}
+    .tx-del:hover{color:#EF4444;}
+
+    /* BOTTOM NAV */
+    .bottom-nav{position:sticky;bottom:0;background:#fff;border-top:1px solid #E5E7EB;display:flex;padding:4px 0 8px;z-index:10;}
+    .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;background:transparent;border:none;cursor:pointer;padding:8px 0;font-family:inherit;}
+    .nav-icon{font-size:20px;}
+    .nav-label{font-size:10px;}
+
+    /* MODAL */
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;z-index:100;}
+    .modal{background:#fff;border-radius:20px 20px 0 0;padding:20px;width:100%;max-width:430px;margin:0 auto;box-shadow:0 -4px 24px rgba(0,0,0,.12);animation:slideup .22s ease;}
+    @keyframes slideup{from{transform:translateY(100%)}to{transform:translateY(0)}}
+    .modal-handle{width:36px;height:4px;background:#E5E7EB;border-radius:2px;margin:0 auto 16px;}
+    .modal-title{font-size:16px;font-weight:800;margin-bottom:16px;}
+    .field-label{font-size:12px;font-weight:600;color:#6B7280;margin-bottom:5px;margin-top:10px;}
+    .field-label:first-of-type{margin-top:0;}
+    .field-input{width:100%;background:#F9FAFB;border:1.5px solid #E5E7EB;border-radius:11px;padding:11px 14px;color:#111827;font-family:inherit;font-size:15px;}
+    .field-input:focus{outline:none;border-color:#7C3AED;}
+    .cat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:2px;}
+    .cat-chip{padding:8px 4px;border-radius:10px;border:1.5px solid #E5E7EB;background:#F9FAFB;cursor:pointer;text-align:center;font-size:11px;font-family:inherit;color:#374151;transition:all .15s;}
+    .cat-chip .cat-emoji{font-size:20px;display:block;margin-bottom:3px;}
+    .cat-chip.selected{border-color:#7C3AED;background:#F5F3FF;color:#5B21B6;font-weight:700;}
+    .preset-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;}
+    .preset-chip{background:#F3F4F6;border:1px solid #E5E7EB;border-radius:20px;padding:5px 11px;font-size:12px;cursor:pointer;font-family:inherit;color:#374151;}
+    .preset-chip:hover{background:#EDE9FE;border-color:#C4B5FD;color:#5B21B6;}
+    .modal-btns{display:flex;gap:10px;margin-top:16px;}
+    .btn-cancel{flex:1;background:#F9FAFB;border:1px solid #E5E7EB;border-radius:11px;padding:13px;color:#9CA3AF;font-family:inherit;font-size:14px;cursor:pointer;}
+    .btn-save{flex:2;border:none;border-radius:11px;padding:13px;color:#fff;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;}
+
+    /* REPORT */
+    .report-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+    .report-mini{padding:14px;}
+    .rm-label{font-size:11px;color:#9CA3AF;margin-bottom:4px;}
+    .rm-val{font-size:20px;font-weight:800;}
+
+    /* TOAST */
+    .toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#1F2937;color:#fff;border-radius:10px;padding:10px 20px;font-size:13px;font-weight:600;z-index:999;animation:fadein .2s ease;}
+    @keyframes fadein{from{opacity:0;transform:translate(-50%,-6px)}to{opacity:1;transform:translate(-50%,0)}}
+
+    /* DARK */
+    body.dark{background:#080811;color:#E2E8F0;}
+    body.dark .header,body.dark .bottom-nav{background:#0F0F1C;border-color:#1E1E38;}
+    body.dark .header-title{color:#E2E8F0;}
+    body.dark .card{background:#141428;border-color:#1E1E38;box-shadow:none;}
+    body.dark .bar-track{background:#1E1E38;}
+    body.dark .tx-row{border-color:#1E1E38;}
+    body.dark .tx-icon.exp{background:#2D0A0A;}
+    body.dark .tx-icon.inc{background:#0A2D0A;}
+    body.dark .tx-desc{color:#E2E8F0;}
+    body.dark .tx-del{color:#374151;}
+    body.dark .qa-btn.exp{background:#2D0A0A;border-color:#7F1D1D;}
+    body.dark .qa-btn.inc{background:#0A2D0A;border-color:#14532D;}
+    body.dark .modal{background:#141428;}
+    body.dark .modal-handle{background:#1E1E38;}
+    body.dark .modal-title{color:#E2E8F0;}
+    body.dark .field-label{color:#64748B;}
+    body.dark .field-input{background:#0F0F1C;border-color:#1E1E38;color:#E2E8F0;}
+    body.dark .cat-chip{background:#0F0F1C;border-color:#1E1E38;color:#94A3B8;}
+    body.dark .cat-chip.selected{background:#1E1B4B;border-color:#6D28D9;color:#C4B5FD;}
+    body.dark .preset-chip{background:#0F0F1C;border-color:#1E1E38;color:#94A3B8;}
+    body.dark .btn-cancel{background:#0F0F1C;border-color:#1E1E38;color:#64748B;}
+    body.dark .overlay{background:rgba(0,0,0,.7);}
+    body.dark .report-mini{color:#E2E8F0;}
+    body.dark .rm-label{color:#4A5568;}
+    body.dark select{background:#0F0F1C;color:#E2E8F0;border-color:#1E1E38;}
+
+    ::-webkit-scrollbar{width:3px;}
+    ::-webkit-scrollbar-thumb{background:#E5E7EB;border-radius:2px;}
+    input[type=number]::-webkit-outer-spin-button,
+    input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
+  </style>
+</head>
+<body>
+<div id="root"></div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────
+const EXPENSE_CATS = {
+  makanan:    {label:"Makanan",    emoji:"🍜", color:"#F97316", presets:["Makan siang","Makan malam","Sarapan","Kopi","Grab Food","Snack"]},
+  transport:  {label:"Transport",  emoji:"🚗", color:"#3B82F6", presets:["Grab","Gojek","Bensin","Parkir","Tol","KRL"]},
+  belanja:    {label:"Belanja",    emoji:"🛍️", color:"#A855F7", presets:["Indomaret","Alfamart","Supermarket","Baju","Shopee","Tokopedia"]},
+  hiburan:    {label:"Hiburan",    emoji:"🎬", color:"#EC4899", presets:["Netflix","Spotify","Bioskop","Game","Gym","Karaoke"]},
+  kesehatan:  {label:"Kesehatan",  emoji:"💊", color:"#10B981", presets:["Apotek","Dokter","Vitamin","Klinik","BPJS"]},
+  tagihan:    {label:"Tagihan",    emoji:"🧾", color:"#6366F1", presets:["Listrik","Internet","Pulsa","Air","Gas","Cicilan"]},
+  pendidikan: {label:"Pendidikan", emoji:"📚", color:"#14B8A6", presets:["Kursus","Buku","Les","Seminar"]},
+  lainnya:    {label:"Lainnya",    emoji:"📦", color:"#94A3B8", presets:[]},
+};
+const INCOME_CATS = {
+  gaji:       {label:"Gaji",       emoji:"💼", color:"#16A34A", presets:["Gaji bulanan","Gaji mingguan","THR","Bonus"]},
+  freelance:  {label:"Freelance",  emoji:"💻", color:"#65A30D", presets:["Project","Desain","Coding","Tulisan"]},
+  bisnis:     {label:"Bisnis",     emoji:"🏪", color:"#CA8A04", presets:["Penjualan","Komisi","Profit"]},
+  investasi:  {label:"Investasi",  emoji:"📈", color:"#0891B2", presets:["Dividen","Saham","Crypto","Reksadana"]},
+  hadiah:     {label:"Hadiah",     emoji:"🎁", color:"#DB2777", presets:["Hadiah","Kado","Transfer"]},
+  lainnya:    {label:"Lainnya",    emoji:"💰", color:"#64748B", presets:[]},
+};
+
+const fmt = n => new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",minimumFractionDigits:0}).format(Math.abs(n));
+const today = () => new Date().toISOString().split("T")[0];
+const monthKey = d => (d||"").slice(0,7);
+const thisMonth = () => monthKey(today());
+const monthLabel = ym => { const [y,m]=ym.split("-"); return new Date(y,m-1).toLocaleDateString("id-ID",{month:"long",year:"numeric"}); };
+
+// ── STATE ─────────────────────────────────────────────────────────────────
+let dark         = localStorage.getItem("dk_dark")==="1";
+let tab          = "home";
+let transactions = JSON.parse(localStorage.getItem("dk_tx")||"[]");
+let modal        = null; // null | "expense" | "income"
+let reportMonth  = thisMonth();
+let form = {desc:"",amount:"",category:"",date:today(),type:""};
+
+function saveTx(){ localStorage.setItem("dk_tx",JSON.stringify(transactions)); }
+
+// ── DERIVED ───────────────────────────────────────────────────────────────
+function derived(){
+  const all   = transactions;
+  const mTx   = all.filter(t=>monthKey(t.date)===thisMonth());
+  const mInc  = mTx.filter(t=>t.type==="income").reduce((s,t)=>s+t.amount,0);
+  const mExp  = mTx.filter(t=>t.type==="expense").reduce((s,t)=>s+t.amount,0);
+  const bal   = all.reduce((s,t)=>t.type==="income"?s+t.amount:s-t.amount,0);
+  const mCatE = mTx.filter(t=>t.type==="expense").reduce((a,t)=>{a[t.category]=(a[t.category]||0)+t.amount;return a;},{});
+  const rTx   = all.filter(t=>monthKey(t.date)===reportMonth);
+  const rInc  = rTx.filter(t=>t.type==="income").reduce((s,t)=>s+t.amount,0);
+  const rExp  = rTx.filter(t=>t.type==="expense").reduce((s,t)=>s+t.amount,0);
+  const rCatE = rTx.filter(t=>t.type==="expense").reduce((a,t)=>{a[t.category]=(a[t.category]||0)+t.amount;return a;},{});
+  const months= [...new Set(all.map(t=>monthKey(t.date)))].filter(Boolean).sort().reverse();
+  return {all,mTx,mInc,mExp,bal,mCatE,rTx,rInc,rExp,rCatE,months};
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────
+function render(){
+  document.body.classList.toggle("dark",dark);
+  const d   = derived();
+  const G   = "#16A34A", R = "#DC2626", P = "#7C3AED";
+  const sisa= d.mInc - d.mExp;
+  const DK  = dark;
+
+  let html = `
+  <div class="header">
+    <div class="header-title">💸 Dompetku</div>
+    <button class="toggle-btn" onclick="toggleDark()">${dark?"☀️":"🌙"}</button>
+  </div>`;
+
+  // ── HOME ─────────────────────────────────────────────────────────────
+  if(tab==="home"){
+    html+=`<div class="scroll">
+      <div class="hero${DK?" dark":""}">
+        <div class="hero-label">SALDO TOTAL</div>
+        <div class="hero-bal">${fmt(d.bal)}</div>
+        <div class="hero-cards">
+          <div class="hero-card"><div class="hc-label">Pemasukan</div><div class="hc-val" style="color:${G}">+${fmt(d.mInc)}</div></div>
+          <div class="hero-card"><div class="hc-label">Pengeluaran</div><div class="hc-val" style="color:${R}">-${fmt(d.mExp)}</div></div>
+          <div class="hero-card"><div class="hc-label">Sisa</div><div class="hc-val" style="color:${sisa>=0?G:R}">${sisa>=0?"+":"-"}${fmt(Math.abs(sisa))}</div></div>
+        </div>
+      </div>
+      <div style="padding:14px 0 0">
+        <div class="quick-add">
+          <button class="qa-btn exp" onclick="openModal('expense')">− Pengeluaran</button>
+          <button class="qa-btn inc" onclick="openModal('income')">+ Pemasukan</button>
+        </div>`;
+
+    if(Object.keys(d.mCatE).length){
+      html+=`<div class="card"><div class="section-label">Pengeluaran Bulan Ini</div>`;
+      Object.entries(d.mCatE).sort((a,b)=>b[1]-a[1]).forEach(([c,a])=>{
+        const pct=(a/(d.mExp||1))*100;
+        html+=`<div class="cat-row">
+          <div class="cat-meta"><span>${EXPENSE_CATS[c]?.emoji} ${EXPENSE_CATS[c]?.label||c}</span><span style="font-weight:700">${fmt(a)}</span></div>
+          <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${EXPENSE_CATS[c]?.color||P}"></div></div>
+        </div>`;
+      });
+      html+=`</div>`;
+    }
+
+    html+=`<div class="card"><div class="section-label">Transaksi Terakhir</div>`;
+    if(!d.all.length){
+      html+=`<div style="text-align:center;padding:24px 0;color:#9CA3AF;font-size:13px;">Belum ada transaksi.<br>Tap tombol di atas untuk mulai.</div>`;
+    } else {
+      d.all.slice(0,30).forEach(t=>{
+        const cats = t.type==="income"?INCOME_CATS:EXPENSE_CATS;
+        html+=`<div class="tx-row">
+          <div class="tx-icon ${t.type==="income"?"inc":"exp"}">${cats[t.category]?.emoji||"💸"}</div>
+          <div style="flex:1;min-width:0">
+            <div class="tx-desc">${t.desc}</div>
+            <div class="tx-sub">${t.date} · ${cats[t.category]?.label||t.category}</div>
+          </div>
+          <div class="tx-amt ${t.type==="income"?"inc":"exp"}">${t.type==="income"?"+":"-"}${fmt(t.amount)}</div>
+          <button class="tx-del" onclick="deleteTx('${t.id}')">×</button>
+        </div>`;
+      });
+    }
+    html+=`</div></div></div>`;
+  }
+
+  // ── REPORT ───────────────────────────────────────────────────────────
+  if(tab==="report"){
+    const sisa2=d.rInc-d.rExp;
+    html+=`<div class="scroll">
+      <div style="font-size:16px;font-weight:800;margin-bottom:14px;color:${DK?"#E2E8F0":"#111827"}">📊 Laporan</div>
+      <div class="card" style="margin-bottom:12px">
+        <div class="section-label">Pilih Periode</div>
+        <select style="width:100%;background:${DK?"#0F0F1C":"#F9FAFB"};border:1.5px solid ${DK?"#1E1E38":"#E5E7EB"};border-radius:10px;padding:11px 14px;color:${DK?"#E2E8F0":"#111827"};font-family:inherit;font-size:14px;" onchange="setReportMonth(this.value)">
+          ${(d.months.length?d.months:[thisMonth()]).map(m=>`<option value="${m}"${m===reportMonth?" selected":""}>${monthLabel(m)}</option>`).join("")}
+        </select>
+      </div>
+      <div class="report-grid">
+        <div class="card report-mini"><div class="rm-label">Pemasukan</div><div class="rm-val" style="color:${G}">${fmt(d.rInc)}</div></div>
+        <div class="card report-mini"><div class="rm-label">Pengeluaran</div><div class="rm-val" style="color:${R}">${fmt(d.rExp)}</div></div>
+      </div>
+      <div class="card" style="margin-bottom:12px;background:${sisa2>=0?(DK?"#0A2D0A":"#F0FDF4"):(DK?"#2D0A0A":"#FFF1F2")};border-color:${sisa2>=0?(DK?"#14532D":"#BBF7D0"):(DK?"#7F1D1D":"#FECDD3")}">
+        <div class="rm-label">Sisa / Defisit</div>
+        <div style="font-size:22px;font-weight:800;color:${sisa2>=0?G:R}">${sisa2>=0?"+":"-"}${fmt(Math.abs(sisa2))}</div>
+        <div style="font-size:11px;color:#9CA3AF;margin-top:4px">${d.rTx.length} transaksi</div>
+      </div>`;
+
+    if(Object.keys(d.rCatE).length){
+      html+=`<div class="card" style="margin-bottom:12px"><div class="section-label">Breakdown Pengeluaran</div>`;
+      Object.entries(d.rCatE).sort((a,b)=>b[1]-a[1]).forEach(([c,a])=>{
+        const pct=(a/(d.rExp||1))*100;
+        html+=`<div class="cat-row">
+          <div class="cat-meta">
+            <div style="display:flex;align-items:center;gap:6px"><div style="width:8px;height:8px;border-radius:2px;background:${EXPENSE_CATS[c]?.color||P}"></div>${EXPENSE_CATS[c]?.label||c}</div>
+            <span style="font-weight:700">${fmt(a)} <span style="font-weight:400;color:#9CA3AF">(${Math.round(pct)}%)</span></span>
+          </div>
+          <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${EXPENSE_CATS[c]?.color||P}"></div></div>
+        </div>`;
+      });
+      html+=`</div>`;
+
+      // income breakdown
+      const rCatI=d.rTx.filter(t=>t.type==="income").reduce((a,t)=>{a[t.category]=(a[t.category]||0)+t.amount;return a;},{});
+      if(Object.keys(rCatI).length){
+        html+=`<div class="card" style="margin-bottom:12px"><div class="section-label">Sumber Pemasukan</div>`;
+        Object.entries(rCatI).sort((a,b)=>b[1]-a[1]).forEach(([c,a])=>{
+          const pct=(a/(d.rInc||1))*100;
+          html+=`<div class="cat-row">
+            <div class="cat-meta">
+              <div style="display:flex;align-items:center;gap:6px"><div style="width:8px;height:8px;border-radius:2px;background:${INCOME_CATS[c]?.color||G}"></div>${INCOME_CATS[c]?.label||c}</div>
+              <span style="font-weight:700">${fmt(a)}</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${INCOME_CATS[c]?.color||G}"></div></div>
+          </div>`;
+        });
+        html+=`</div>`;
+      }
+    }
+
+    if(d.rTx.length){
+      html+=`<div class="card"><div class="section-label">Detail Transaksi</div>`;
+      d.rTx.forEach(t=>{
+        const cats=t.type==="income"?INCOME_CATS:EXPENSE_CATS;
+        html+=`<div class="tx-row">
+          <span style="font-size:18px;flex-shrink:0">${cats[t.category]?.emoji||"💸"}</span>
+          <div style="flex:1;min-width:0"><div class="tx-desc">${t.desc}</div><div class="tx-sub">${t.date}</div></div>
+          <div class="tx-amt ${t.type==="income"?"inc":"exp"}">${t.type==="income"?"+":"-"}${fmt(t.amount)}</div>
+        </div>`;
+      });
+      html+=`</div>`;
+    } else {
+      html+=`<div style="text-align:center;padding:32px 0;color:#9CA3AF;font-size:13px">Tidak ada data untuk periode ini</div>`;
+    }
+    html+=`</div>`;
+  }
+
+  // ── BOTTOM NAV ────────────────────────────────────────────────────────
+  html+=`<div class="bottom-nav" style="background:${DK?"#0F0F1C":"#fff"};border-color:${DK?"#1E1E38":"#E5E7EB"}">
+    ${[["home","🏠","Home"],["report","📊","Laporan"]].map(([id,icon,label])=>`
+    <button class="nav-btn" onclick="setTab('${id}')" style="color:${tab===id?P:(DK?"#4A5568":"#9CA3AF")}">
+      <span class="nav-icon">${icon}</span>
+      <span class="nav-label" style="font-weight:${tab===id?700:400}">${label}</span>
+    </button>`).join("")}
+  </div>`;
+
+  // ── MODAL ─────────────────────────────────────────────────────────────
+  if(modal){
+    const cats = modal==="income"?INCOME_CATS:EXPENSE_CATS;
+    const selCat = form.category || Object.keys(cats)[0];
+    const presets = cats[selCat]?.presets||[];
+    html+=`<div class="overlay" onclick="bgClose(event)">
+      <div class="modal">
+        <div class="modal-handle"></div>
+        <div class="modal-title" style="color:${modal==="income"?G:R}">${modal==="income"?"💰 Tambah Pemasukan":"💸 Tambah Pengeluaran"}</div>
+
+        <div class="field-label">Kategori</div>
+        <div class="cat-grid">
+          ${Object.entries(cats).map(([k,v])=>`
+          <button class="cat-chip${selCat===k?" selected":""}" onclick="selectCat('${k}')">
+            <span class="cat-emoji">${v.emoji}</span>${v.label}
+          </button>`).join("")}
+        </div>
+
+        ${presets.length?`<div class="field-label">Preset Nama</div>
+        <div class="preset-row">
+          ${presets.map(p=>`<button class="preset-chip" onclick="setDesc('${p}')">${p}</button>`).join("")}
+        </div>`:""}
+
+        <div class="field-label">Nama / Keterangan</div>
+        <input class="field-input" id="descInput" placeholder="Contoh: Makan siang" value="${form.desc}" oninput="form.desc=this.value"/>
+
+        <div class="field-label">Jumlah (Rp)</div>
+        <input class="field-input" id="amountInput" type="number" placeholder="50000" value="${form.amount}" oninput="form.amount=this.value"/>
+
+        <div class="field-label">Tanggal</div>
+        <input class="field-input" type="date" value="${form.date}" onchange="form.date=this.value"/>
+
+        <div class="modal-btns">
+          <button class="btn-cancel" onclick="closeModal()">Batal</button>
+          <button class="btn-save" style="background:${modal==="income"?G:P}" onclick="submitForm()">Simpan</button>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  document.getElementById("root").innerHTML = html;
+}
+
+// ── ACTIONS ───────────────────────────────────────────────────────────────
+function toggleDark(){ dark=!dark; localStorage.setItem("dk_dark",dark?"1":"0"); render(); }
+function setTab(t){ tab=t; render(); }
+function setReportMonth(m){ reportMonth=m; render(); }
+
+function openModal(type){
+  modal=type;
+  form={desc:"",amount:"",category:Object.keys(type==="income"?INCOME_CATS:EXPENSE_CATS)[0],date:today(),type};
+  render();
+}
+function closeModal(){ modal=null; render(); }
+function bgClose(e){ if(e.target===e.currentTarget) closeModal(); }
+
+function selectCat(k){
+  form.category=k;
+  // keep desc if user typed manually, otherwise clear to re-pick preset
+  const descEl=document.getElementById("descInput");
+  const presets=(modal==="income"?INCOME_CATS:EXPENSE_CATS)[k]?.presets||[];
+  if(descEl && presets.includes(descEl.value)) form.desc="";
+  render();
+  setTimeout(()=>{ const d=document.getElementById("descInput"); if(d) d.focus(); },50);
+}
+
+function setDesc(p){
+  form.desc=p;
+  render();
+  setTimeout(()=>{ const a=document.getElementById("amountInput"); if(a) a.focus(); },50);
+}
+
+function submitForm(){
+  const desc = (document.getElementById("descInput")?.value||form.desc).trim();
+  const amt  = Number(document.getElementById("amountInput")?.value||form.amount);
+  if(!desc||!amt||amt<=0){ toast("Isi nama dan jumlah dulu"); return; }
+  transactions.unshift({
+    id: Date.now().toString(),
+    type: modal,
+    desc,
+    amount: amt,
+    category: form.category||(modal==="income"?"gaji":"lainnya"),
+    date: form.date||today()
+  });
+  saveTx();
+  closeModal();
+  toast(modal==="income"?"✅ Pemasukan dicatat!":"✅ Pengeluaran dicatat!");
+}
+
+function deleteTx(id){
+  transactions=transactions.filter(t=>t.id!==id);
+  saveTx(); render();
+}
+
+function toast(msg){
+  const el=document.createElement("div");
+  el.className="toast"; el.textContent=msg;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),2500);
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+render();
+</script>
+
+<script>
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+</script>
+</body>
+</html>
